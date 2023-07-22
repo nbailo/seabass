@@ -83,9 +83,7 @@ describe("CircuitBreaker", async () => {
   });
 
   it("should perform upkeep", async () => {
-    const {circuitBreaker, externalContract} = await loadFixture(
-      deployFixture
-    );
+    const {circuitBreaker, externalContract} = await loadFixture(deployFixture);
 
     expect(await externalContract.getStatus()).to.be.true;
     await circuitBreaker.performUpkeep("0x");

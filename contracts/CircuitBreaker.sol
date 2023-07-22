@@ -34,9 +34,7 @@ contract CircuitBreaker is KeeperCompatibleInterface {
         externalContract = _externalContract;
         functionSelector = bytes4(keccak256(bytes(_functionName)));
 
-        (, int256 latestAnswer, , , ) = priceFeed.latestRoundData();
-        oracleLatestAnswerInfo.latestAnswer = latestAnswer;
-        oracleLatestAnswerInfo.timestamp = block.timestamp;
+        _setPrice();
     }
 
     function checkUpkeep(
@@ -47,6 +45,11 @@ contract CircuitBreaker is KeeperCompatibleInterface {
         override
         returns (bool upkeepNeeded, bytes memory performData)
     {
+        // Check if at least a day has passed since the last price update
+        bool priceUpdateNeeded = (block.timestamp -
+            oracleLatestAnswerInfo.timestamp >=
+            1 days);
+
         (, int256 latestAnswer, , , ) = priceFeed.latestRoundData();
 
         OracleLatestAnswerInfo
@@ -57,18 +60,28 @@ contract CircuitBreaker is KeeperCompatibleInterface {
         int256 deltaTime = (block.timestamp - _oracleLatestAnswerInfo.timestamp)
             .toInt256();
 
+        if (delta < 0) delta = 0 - delta;
+        if (deltaTime == 0 || _oracleLatestAnswerInfo.latestAnswer == 0)
+            delta = 0;
         delta = (delta * (1 ether)) / _oracleLatestAnswerInfo.latestAnswer;
 
         // Check if deviation is within limit
+        bool priceFluctuated;
         if (uint256(delta / deltaTime) > oracleDeviationLimit) {
-            upkeepNeeded = true;
-            performData = checkData;
+            priceFluctuated = true;
         } else {
-            upkeepNeeded = false;
+            priceFluctuated = false;
         }
+
+        upkeepNeeded = priceUpdateNeeded || priceFluctuated;
+        performData = checkData;
     }
 
     function performUpkeep(bytes calldata performData) external override {
+        if (block.timestamp - oracleLatestAnswerInfo.timestamp >= 1 days) {
+            _setPrice();
+        }
+
         if (!stopped) {
             // Call the specific function on the external contract
             (bool success, ) = externalContract.call(
@@ -77,5 +90,11 @@ contract CircuitBreaker is KeeperCompatibleInterface {
             require(success, "External call failed");
             stopped = true;
         }
+    }
+
+    function _setPrice() internal {
+        (, int256 latestAnswer, , , ) = priceFeed.latestRoundData();
+        oracleLatestAnswerInfo.latestAnswer = latestAnswer;
+        oracleLatestAnswerInfo.timestamp = block.timestamp;
     }
 }
