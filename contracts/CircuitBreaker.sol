@@ -30,7 +30,7 @@ contract CircuitBreaker is KeeperCompatibleInterface {
         string memory _functionName
     ) {
         priceFeed = AggregatorV3Interface(_priceFeed);
-        oracleDeviationLimit = _oracleDeviationLimit; //  10% within 1 day = 10 * (1 ether) / uint256(86400)
+        oracleDeviationLimit = _oracleDeviationLimit; //  10% within 1 day = 10 * (1 ether) / uint256(86400 * 100)
         externalContract = _externalContract;
         functionName = _functionName;
 

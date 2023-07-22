@@ -32,7 +32,9 @@ describe("CircuitBreaker", async () => {
     externalContract = await externalContractF.deploy();
     await externalContract.deployed();
 
-    const oracleDeviationLimit = ethers.BigNumber.from("115740740740740"); // 10% per day
+    const BASE = ethers.utils.parseEther("1");
+    const percentages = ethers.BigNumber.from("10");
+    const oracleDeviationLimit = percentages.mul(BASE).div(8640000); // 10% per day
 
     const circuitBreakerF = await ethers.getContractFactory(
       "CircuitBreaker",
@@ -66,5 +68,17 @@ describe("CircuitBreaker", async () => {
     expect(priceFeed.address).to.be.properAddress;
     expect(externalContract.address).to.be.properAddress;
     expect(circuitBreaker.address).to.be.properAddress;
+  });
+
+  it("should set upkeep is needed when price has fluctuation", async () => {
+    const {priceFeed, circuitBreaker} = await loadFixture(deployFixture);
+
+    const latestRoundData = await priceFeed.latestRoundData();
+    const latestAnswer = latestRoundData.answer;
+    // new latest answer is 2% less than the current latest answer
+    const newLatestAnswer = latestAnswer.sub(latestAnswer.mul(2).div(100));
+    expect((await circuitBreaker.checkUpkeep("0x")).upkeepNeeded).to.be.false;
+    await priceFeed.updateRate(8, newLatestAnswer);
+    expect((await circuitBreaker.checkUpkeep("0x")).upkeepNeeded).to.be.true;
   });
 });
