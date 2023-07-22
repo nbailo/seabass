@@ -44,7 +44,7 @@ describe("CircuitBreaker", async () => {
       priceFeed.address,
       oracleDeviationLimit,
       externalContract.address,
-      paymentToken.address
+      "update()"
     );
 
     paymentToken.transfer(user1.address, ethers.utils.parseEther("1000"));
@@ -80,5 +80,15 @@ describe("CircuitBreaker", async () => {
     expect((await circuitBreaker.checkUpkeep("0x")).upkeepNeeded).to.be.false;
     await priceFeed.updateRate(8, newLatestAnswer);
     expect((await circuitBreaker.checkUpkeep("0x")).upkeepNeeded).to.be.true;
+  });
+
+  it("should perform upkeep", async () => {
+    const {circuitBreaker, externalContract} = await loadFixture(
+      deployFixture
+    );
+
+    expect(await externalContract.getStatus()).to.be.true;
+    await circuitBreaker.performUpkeep("0x");
+    expect(await externalContract.getStatus()).to.be.false;
   });
 });

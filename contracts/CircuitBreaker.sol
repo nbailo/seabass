@@ -13,7 +13,7 @@ contract CircuitBreaker is KeeperCompatibleInterface {
     bool public stopped = false;
     address public externalContract;
     uint256 public oracleDeviationLimit;
-    string public functionName;
+    bytes4 public functionSelector;
     uint256 public endSubscriptionTime;
 
     struct OracleLatestAnswerInfo {
@@ -32,7 +32,7 @@ contract CircuitBreaker is KeeperCompatibleInterface {
         priceFeed = AggregatorV3Interface(_priceFeed);
         oracleDeviationLimit = _oracleDeviationLimit; //  10% within 1 day = 10 * (1 ether) / uint256(86400 * 100)
         externalContract = _externalContract;
-        functionName = _functionName;
+        functionSelector = bytes4(keccak256(bytes(_functionName)));
 
         (, int256 latestAnswer, , , ) = priceFeed.latestRoundData();
         oracleLatestAnswerInfo.latestAnswer = latestAnswer;
@@ -62,7 +62,7 @@ contract CircuitBreaker is KeeperCompatibleInterface {
         // Check if deviation is within limit
         if (uint256(delta / deltaTime) > oracleDeviationLimit) {
             upkeepNeeded = true;
-            performData = "";
+            performData = checkData;
         } else {
             upkeepNeeded = false;
         }
@@ -72,7 +72,7 @@ contract CircuitBreaker is KeeperCompatibleInterface {
         if (!stopped) {
             // Call the specific function on the external contract
             (bool success, ) = externalContract.call(
-                abi.encodePacked(functionName)
+                abi.encodeWithSelector(functionSelector)
             );
             require(success, "External call failed");
             stopped = true;
