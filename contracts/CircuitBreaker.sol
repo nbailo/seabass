@@ -73,7 +73,7 @@ contract CircuitBreaker is KeeperCompatibleInterface {
             priceFluctuated = false;
         }
 
-        upkeepNeeded = priceUpdateNeeded || priceFluctuated;
+        upkeepNeeded = priceUpdateNeeded || (priceFluctuated && !stopped);
         performData = checkData;
     }
 
