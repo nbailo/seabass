@@ -2,7 +2,6 @@
 
 pragma solidity 0.8.13;
 
-
 contract AggregatorMock {
     uint8 _decimals;
     int256 _latestAnswer;
