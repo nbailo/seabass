@@ -1,0 +1,10 @@
+node_modules
+build
+.openzeppelin
+*.orig
+.DS_Store
+artifacts
+cache
+typechain-types/
+
+.env*
