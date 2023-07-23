@@ -4,60 +4,11 @@ pragma solidity 0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
-import {AutomationRegistryInterface, State, Config} from "@chainlink/contracts/src/v0.8/interfaces/AutomationRegistryInterface1_2.sol";
+import "./interfaces/KeeperRegistrarInterface.sol";
+import "./interfaces/KeeperRegistryInterface.sol";
+import "./interfaces/Link677Interface.sol";
+import "./interfaces/PegSwapInterface.sol";
 import "./CircuitBreaker.sol";
-
-interface KeeperRegistrarInterface {
-    function register(
-        string memory name,
-        bytes calldata encryptedEmail,
-        address upkeepContract,
-        uint32 gasLimit,
-        address adminAddress,
-        bytes calldata checkData,
-        uint96 amount,
-        uint8 source,
-        address sender
-    ) external;
-}
-
-interface KeeperRegistryInterface {
-    function withdrawFunds(uint256 id, address to) external;
-
-    function cancelUpkeep(uint256 id) external;
-
-    function getState()
-        external
-        view
-        returns (
-            State memory state,
-            Config memory config,
-            address[] memory keepers
-        );
-}
-
-interface Link677Interface {
-    function transferAndCall(
-        address _to,
-        uint256 _value,
-        bytes calldata _data
-    ) external returns (bool success);
-
-    function transferFrom(
-        address _from,
-        address _to,
-        uint256 _value
-    ) external returns (bool success);
-
-    function approve(
-        address _spender,
-        uint256 _value
-    ) external returns (bool success);
-}
-
-interface PegSwapInterface {
-    function swap(uint256 amount, address source, address target) external;
-}
 
 contract CircuitBreakerFactory {
     using SafeCast for uint256;

@@ -25,6 +25,8 @@ contract CircuitBreaker is KeeperCompatibleInterface {
 
     OracleLatestAnswerInfo public oracleLatestAnswerInfo;
 
+    event CircuitBreakerStopped();
+
     constructor(
         address _owner,
         address _priceFeed,
@@ -102,6 +104,7 @@ contract CircuitBreaker is KeeperCompatibleInterface {
             );
             require(success, "External call failed");
             stopped = true;
+            emit CircuitBreakerStopped();
         }
     }
 
