@@ -43,6 +43,10 @@ Deploy the smart contracts on the Polygon network:
 
     npx hardhat run --network polygon scripts/deploy_circuitBreakerFactory.ts
 
+## Mocked Contracts
+
+- Price Feed `0x24417760E8Ede13cFa269aDdFF2d90231D7Bd152`
+- External Contract `0xc07c1530141636F3dfB2905b82Fb25b3D0d501cA`
 
 ## License
 This project is licensed under the MIT License.
