@@ -16,6 +16,7 @@ contract CircuitBreaker is KeeperCompatibleInterface {
     uint256 public oracleDeviationLimit;
     bytes4 public functionSelector;
     uint256 public endSubscriptionTime;
+    address public keeper;
 
     struct OracleLatestAnswerInfo {
         int256 latestAnswer;
@@ -29,15 +30,22 @@ contract CircuitBreaker is KeeperCompatibleInterface {
         address _priceFeed,
         uint256 _oracleDeviationLimit,
         address _externalContract,
-        string memory _functionName
+        string memory _functionName,
+        address _keeper
     ) {
         owner = _owner;
         priceFeed = AggregatorV3Interface(_priceFeed);
         oracleDeviationLimit = _oracleDeviationLimit; //  10% within 1 day = 10 * (1 ether) / uint256(86400 * 100)
         externalContract = _externalContract;
         functionSelector = bytes4(keccak256(bytes(_functionName)));
+        keeper = _keeper;
 
         _setPrice();
+    }
+
+    modifier onlyKeeper() {
+        require(msg.sender == keeper, "Only keeper can call this");
+        _;
     }
 
     function checkUpkeep(
@@ -80,7 +88,7 @@ contract CircuitBreaker is KeeperCompatibleInterface {
         performData = checkData;
     }
 
-    function performUpkeep(bytes calldata performData) external override {
+    function performUpkeep(bytes calldata performData) external override onlyKeeper {
         if (block.timestamp - oracleLatestAnswerInfo.timestamp >= 1 days) {
             _setPrice();
         }

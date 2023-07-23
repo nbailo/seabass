@@ -119,7 +119,8 @@ contract CircuitBreakerFactory {
             _priceFeed,
             _oracleDeviationLimit,
             _externalContract,
-            _functionName
+            _functionName,
+            address(registry)
         );
 
         (State memory state, , ) = registry.getState();
