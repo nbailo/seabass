@@ -50,6 +50,13 @@ contract CircuitBreaker is KeeperCompatibleInterface {
         _;
     }
 
+    /**
+     * @notice Check if upkeep is needed
+     * @param checkData The data passed to the contract when checking for upkeep
+     * @return upkeepNeeded boolean to indicate whether upkeep is needed
+     * @return performData bytes that encode the data to be passed to the
+     * contract when performing upkeep
+     */
     function checkUpkeep(
         bytes calldata checkData
     )
@@ -90,6 +97,10 @@ contract CircuitBreaker is KeeperCompatibleInterface {
         performData = checkData;
     }
 
+    /**
+     * @notice Perform upkeep
+     * @param performData The data passed to the contract when performing upkeep
+     */
     function performUpkeep(
         bytes calldata performData
     ) external override onlyKeeper {

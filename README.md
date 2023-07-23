@@ -1,4 +1,5 @@
-# Circuit Breaker as a Service. CBaaS. Seebass.
+![Alt text](telegram-cloud-document-2-5323350060581270721.jpg)
+
 
 This is a subscription-based circuit breaker system leveraging the power of Chainlink. The system monitors specific Chainlink price feeds for fluctuations beyond a user-defined threshold. Upon reaching this threshold, it performs a pre-set action, all in a decentralized and automated manner.
 

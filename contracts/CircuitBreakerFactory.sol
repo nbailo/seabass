@@ -45,6 +45,15 @@ contract CircuitBreakerFactory {
         companyWallet = _companyWallet;
     }
 
+    /**
+     * @notice Create a circuit breaker contract
+     * @param _amount The amount of LINK to send to the circuit breaker contract
+     * @param _priceFeed The address of the price feed to use
+     * @param _owner The owner of the circuit breaker contract
+     * @param _oracleDeviationLimit The deviation limit of the oracle
+     * @param _externalContract The address of the external contract to call
+     * @param _functionName The name of the function to call on the external contract
+     */
     function createCircuitBreaker(
         uint256 _amount,
         address _priceFeed,
@@ -118,14 +127,29 @@ contract CircuitBreakerFactory {
         }
     }
 
+    /**
+     * @notice Cancel upkeep
+     * @param _id The ID of the upkeep to cancel
+     */
     function cancel(uint256 _id) public {
         registry.cancelUpkeep(_id);
     }
 
+    /**
+     * @notice Withdraw LINK from upkeep
+     * @param _id The ID of the upkeep to withdraw from
+     * @param _to The address to withdraw to
+     */
     function withdraw(uint256 _id, address _to) public {
         registry.withdrawFunds(_id, _to);
     }
 
+    /**
+     * @notice Get the user info
+     * @param _user The address of the user
+     * @param _id The ID of the upkeep
+     * @return The user info
+     */
     function getUserInfo(
         address _user,
         uint256 _id
