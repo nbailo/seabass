@@ -102,6 +102,7 @@ contract CircuitBreakerFactory {
         address _externalContract,
         string memory _functionName
     ) external {
+        require(_amount >= 5e17, "Amount must be at least 0.5 LINK");
         require(
             link20.transferFrom(msg.sender, address(this), _amount),
             "Failed to transfer LINK"

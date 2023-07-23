@@ -88,7 +88,9 @@ contract CircuitBreaker is KeeperCompatibleInterface {
         performData = checkData;
     }
 
-    function performUpkeep(bytes calldata performData) external override onlyKeeper {
+    function performUpkeep(
+        bytes calldata performData
+    ) external override onlyKeeper {
         if (block.timestamp - oracleLatestAnswerInfo.timestamp >= 1 days) {
             _setPrice();
         }
