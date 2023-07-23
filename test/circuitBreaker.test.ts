@@ -41,6 +41,7 @@ describe("CircuitBreaker", async () => {
       owner
     );
     circuitBreaker = await circuitBreakerF.deploy(
+      owner.address,
       priceFeed.address,
       oracleDeviationLimit,
       externalContract.address,

@@ -11,6 +11,7 @@ contract CircuitBreaker is KeeperCompatibleInterface {
 
     AggregatorV3Interface internal priceFeed;
     bool public stopped = false;
+    address public owner;
     address public externalContract;
     uint256 public oracleDeviationLimit;
     bytes4 public functionSelector;
@@ -24,11 +25,13 @@ contract CircuitBreaker is KeeperCompatibleInterface {
     OracleLatestAnswerInfo public oracleLatestAnswerInfo;
 
     constructor(
+        address _owner,
         address _priceFeed,
         uint256 _oracleDeviationLimit,
         address _externalContract,
         string memory _functionName
     ) {
+        owner = _owner;
         priceFeed = AggregatorV3Interface(_priceFeed);
         oracleDeviationLimit = _oracleDeviationLimit; //  10% within 1 day = 10 * (1 ether) / uint256(86400 * 100)
         externalContract = _externalContract;
